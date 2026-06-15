@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid py-2">
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card p-4 border-0 shadow-sm">
+                <div class="col-lg-8">
+    <div class="card p-4 border-0 shadow-sm">
+        
+        {% if search_query %}
+            <div class="alert alert-info border-0 shadow-sm d-flex justify-content-between align-items-center mb-3">
+                <span>Showing search results matching: <strong>"{{ search_query }}"</strong></span>
+                <a href="{{ url_for('students.directory') }}" class="btn btn-sm btn-outline-secondary bg-white">Clear Filter</a>
+            </div>
+        {% endif %}
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold text-dark mb-0">Master Student Directory</h5>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0">Master Student Directory</h5>
+                    <span class="badge bg-dark px-3 py-2 rounded-pill">{{ total }} Registered Records</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-borderless align-middle border-top pt-2">
+                        <thead>
+                            <tr class="text-muted small text-uppercase">
+                                <th class="pb-3">ID / Adm No</th>
+                                <th class="pb-3">Full Name</th>
+                                <th class="pb-3">Current Grade</th>
+                                <th class="pb-3">Primary Guardian</th>
+                                <th class="pb-3 text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in students %}
+                            <tr class="border-bottom" style="border-color: #F4F1EA !important;">
+                                <td class="py-3 mono small fw-bold text-secondary">#{{ student.admission_no }}</td>
+                                <td class="py-3 fw-semibold text-dark">{{ student.full_name }}</td>
+                                <td class="py-3"><span class="badge bg-light border text-dark">{{ student.target_class }}</span></td>
+                                <td class="py-3">
+                                    <div class="text-dark">{{ student.parent_name }}</div>
+                                    <div class="text-muted small text-xs">{{ student.parent_phone }}</div>
+                                </td>
+                                <td class="py-3 text-end">
+                                    <a href="{{ url_for('students.view_profile', student_id=student.id) }}" class="btn btn-sm btn-outline-dark px-3">View 360° Profile</a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-5">No students registered in the master directory yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card p-4 border-0 shadow-sm">
+                <h5 class="fw-bold mb-1 text-dark">Enroll New Student</h5>
+                <p class="text-muted small mb-4">Generates permanent ledger files across administrative modules.</p>
+                
+                <form action="{{ url_for('students.register_student') }}" method="POST">
+                    <div class="mb-2">
+                        <label class="form-label small fw-semibold">Admission Roll Number</label>
+                        <input type="text" name="admission_no" class="form-control" style="background-color: #F7F5F0; border: 1px solid #EBE7DF;" placeholder="e.g. SCH-2026-001" required>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small fw-semibold">Student Full Name</label>
+                        <input type="text" name="full_name" class="form-control" style="background-color: #F7F5F0; border: 1px solid #EBE7DF;" placeholder="Match spelling exactly across modules" required>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small fw-semibold">Class Assignment</label>
+                        <select name="target_class" class="form-select" style="background-color: #F7F5F0; border: 1px solid #EBE7DF;" required>
+                            <option value="Nursery / KG">Nursery / KG</option>
+                            <option value="Primary Class 1-5">Primary Class 1-5</option>
+                            <option value="Middle School Class 6-8">Middle School Class 6-8</option>
+                            <option value="High School Class 9-10">High School Class 9-10</option>
+                            <option value="Senior Secondary 11-12">Senior Secondary 11-12</option>
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small fw-semibold">Parent / Guardian Name</label>
+                        <input type="text" name="parent_name" class="form-control" style="background-color: #F7F5F0; border: 1px solid #EBE7DF;" placeholder="e.g. S.K. Sharma" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label small fw-semibold">Emergency Contact Phone</label>
+                        <input type="tel" name="parent_phone" class="form-control" style="background-color: #F7F5F0; border: 1px solid #EBE7DF;" placeholder="e.g. +91 98765 43210" required>
+                    </div>
+                    <button type="submit" class="btn btn-olive w-100 py-2.5 shadow-sm">Save Roster File</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

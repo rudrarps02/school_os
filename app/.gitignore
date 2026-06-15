@@ -1,0 +1,14 @@
+# Environmental Secrets
+.env
+
+# Python Cache compiler files
+__pycache__/
+*.pyc
+
+# Local Development Database instances
+*.db
+instance/
+
+# Virtual Environment directories
+venv/
+.venv/

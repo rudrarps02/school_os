@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid py-2">
+    
+    <!-- Flash Messages Specific Handling inside Content Block -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Elegant Theme Operational Summary Metric Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card p-3 border-0 shadow-sm" style="border-left: 4px solid #3B5334 !important;">
+                <span class="text-muted small fw-bold text-uppercase tracking-wider">Total System Inquiries</span>
+                <h2 class="fw-bold mt-1 mb-0 text-dark">{{ total }}</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 border-0 shadow-sm" style="border-left: 4px solid #ffc107 !important;">
+                <span class="text-muted small fw-bold text-uppercase tracking-wider">Active Follow-ups</span>
+                <h2 class="fw-bold mt-1 mb-0 text-warning">{{ followups }}</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 border-0 shadow-sm" style="border-left: 4px solid #198754 !important;">
+                <span class="text-muted small fw-bold text-uppercase tracking-wider">Converted Admissions</span>
+                <h2 class="fw-bold mt-1 mb-0 text-success">{{ converted }}</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 border-0 shadow-sm" style="border-left: 4px solid #4A5D4E !important;">
+                <span class="text-muted small fw-bold text-uppercase tracking-wider">CRM Conversion Rate</span>
+                <h2 class="fw-bold mt-1 mb-0" style="color: #3B5334;">{{ rate }}%</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interface Workspace Layout Split -->
+    <div class="row g-4">
+        
+        <!-- Interactive Pipeline Tracker Pipeline Data Table Component -->
+        <div class="col-lg-8">
+            <div class="card p-4 border-0 shadow-sm">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0 text-dark">Recent Inquiries Data Stream</h5>
+                    <span class="badge rounded-pill px-3 py-2 bg-light text-dark border fw-medium">Real-time Pipeline</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table align-middle table-borderless border-top pt-2">
+                        <thead>
+                            <tr class="text-muted small text-uppercase fw-semibold" style="letter-spacing: 0.5px;">
+                                <th class="pb-3">Student Context</th>
+                                <th class="pb-3">Parent Information</th>
+                                <th class="pb-3">Target Grade</th>
+                                <th class="pb-3">Status Badge</th>
+                                <th class="pb-3 text-end">Action Interface</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for inquiry in inquiries %}
+                            <tr class="border-bottom" style="border-color: #F4F1EA !important;">
+                                <td class="py-3">
+                                    <div class="fw-semibold text-dark">{{ inquiry.student_name }}</div>
+                                    <small class="text-muted d-block mt-1" style="max-width: 180px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
+                                        {{ inquiry.notes if inquiry.notes else 'No structural context notes.' }}
+                                    </small>
+                                </td>
+                                <td class="py-3">
+                                    <div class="text-dark">{{ inquiry.parent_name }}</div>
+                                    <small class="text-muted">{{ inquiry.phone }}</small>
+                                    {% if inquiry.email %}<small class="text-muted d-block text-lowercase">{{ inquiry.email }}</small>{% endif %}
+                                </td>
+                                <td class="py-3">
+                                    <span class="badge px-2.5 py-1.5 font-medium border text-dark bg-light">{{ inquiry.target_class }}</span>
+                                </td>
+                                <td class="py-3">
+                                    {% if inquiry.status == 'Inquiry' %}
+                                        <span class="badge px-3 py-2 text-dark bg-info-subtle border border-info-subtle rounded-pill">New Inquiry</span>
+                                    {% elif inquiry.status == 'Follow-up' %}
+                                        <span class="badge px-3 py-2 text-dark bg-warning-subtle border border-warning-subtle rounded-pill">In Follow-Up</span>
+                                    {% elif inquiry.status == 'Converted' %}
+                                        <span class="badge px-3 py-2 text-success bg-success-subtle border border-success-subtle rounded-pill">Admitted / Enrolled</span>
+                                    {% elif inquiry.status == 'Closed' %}
+                                        <span class="badge px-3 py-2 text-muted bg-secondary-subtle border border-secondary-subtle rounded-pill">Closed Drop</span>
+                                    {% endif %}
+                                </td>
+                               <td class="py-3 text-end">
+    {% if current_user.role == 'Admin' %}
+        <div class="dropdown">
+            <button class="btn btn-sm btn-light border dropdown-toggle px-3 text-xs fw-medium" type="button" data-bs-toggle="dropdown">
+                Manage Status
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                <li>
+                    <form action="{{ url_for('admissions.update_status', inquiry_id=inquiry.id, new_status='Inquiry') }}" method="POST">
+                        <button type="submit" class="dropdown-item py-2 text-xs">📋 Mark as Inquiry</button>
+                    </form>
+                </li>
+                <li>
+                    <form action="{{ url_for('admissions.update_status', inquiry_id=inquiry.id, new_status='Follow-up') }}" method="POST">
+                        <button type="submit" class="dropdown-item py-2 text-xs">📞 Mark as Follow-up</button>
+                    </form>
+                </li>
+                <li>
+                    <form action="{{ url_for('admissions.update_status', inquiry_id=inquiry.id, new_status='Converted') }}" method="POST">
+                        <button type="submit" class="dropdown-item py-2 text-xs text-success fw-bold">✨ Converted</button>
+                    </form>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <form action="{{ url_for('admissions.update_status', inquiry_id=inquiry.id, new_status='Closed') }}" method="POST">
+                        <button type="submit" class="dropdown-item py-2 text-danger text-xs">❌ Drop / Close Lead</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    {% else %}
+        <span class="badge bg-light text-muted text-xs py-1 px-2 border fw-normal">
+            🔒 Locked (Read-Only)
+        </span>
+    {% endif %}
+</td>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-5">
+                                    <div class="fs-4 mb-2">📋</div>
+                                    <div>The pipeline stream database configuration is blank. Log an inquiry manually on the right workspace panel.</div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add New Lead Sidebar Container Widget -->
+        <div class="col-lg-4">
+            {% if current_user.role == 'Admin' %}
+            <div class="card p-4 border-0 shadow-sm" style="background-color: #FFFFFF;">
+                <h5 class="fw-bold mb-1 text-dark">Log Parent Context Lead</h5>
+                <p class="text-muted small mb-4">Input direct initial inquiry metrics to feed tracking summaries.</p>
+                
+                <form action="{{ url_for('admissions.add_inquiry') }}" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-dark">Target Student Name <span class="text-danger">*</span></label>
+                        <input type="text" name="student_name" class="form-control" style="background-color: #F7F5F0; border: 1px solid #EBE7DF;" placeholder="e.g. Rahul Sharma" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-dark">Parent / Guardian Name <span class="text-danger">*</span></label>
+                        <input type="text" name="parent_name" class="form-control" style="background-color: #F7F5F0; border: 1px solid #EBE7DF;" placeholder="e.g. Amit Sharma" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-dark">Primary Contact Mobile <span class="text-danger">*</span></label>
+                        <input type="tel" name="phone" class="form-control" style="background-color: #F7F5F0; border: 1px solid #EBE7DF;" placeholder="e.g. +91 98765 43210" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-dark">Parent Email ID</label>
+                        <input type="email" name="email" class="form-control" style="background-color: #F7F5F0; border: 1px solid #EBE7DF;" placeholder="name@domain.com">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-dark">Seeking Admission Target Class <span class="text-danger">*</span></label>
+                        <select name="target_class" class="form-select" style="background-color: #F7F5F0; border: 1px solid #EBE7DF;" required>
+                            <option value="" selected disabled>Select Grade Target</option>
+                            <option value="Nursery / KG">Nursery / KG</option>
+                            <option value="Primary Class 1-5">Primary Class 1-5</option>
+                            <option value="Middle School Class 6-8">Middle School Class 6-8</option>
+                            <option value="High School Class 9-10">High School Class 9-10</option>
+                            <option value="Senior Secondary 11-12">Senior Secondary 11-12</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-dark">Context Stream Conversation Notes</label>
+                        <textarea name="notes" class="form-control" style="background-color: #F7F5F0; border: 1px solid #EBE7DF;" rows="3" placeholder="Inquired about fee installments, bus tracking routing details..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-olive w-100 py-2.5 shadow-sm mt-2">Commit Record To System Pipeline</button>
+                </form>
+</div>
+{% else %}
+    <div class="card p-4 border-0 shadow-sm bg-light text-center text-muted mb-4">
+        <p class="mb-0 py-4 text-xs fw-medium">
+            ⚠️ Creation privileges restricted to Administrator accounts.
+        </p>
+    </div>
+{% endif %}
+</div>
+</div>
+</div>
+{% endblock %}

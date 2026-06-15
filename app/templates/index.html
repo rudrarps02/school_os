@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid py-3">
+    
+    <div class="p-5 mb-4 rounded-3 text-white shadow-sm" style="background-color: #2D3E2E;">
+        <div class="container-fluid py-2">
+            <h1 class="display-5 fw-bold">School OS Command Panel 🚀</h1>
+            <p class="col-md-8 fs-5 text-white-50">Real-time enterprise intelligence tracking administrative records, operational lifecycles, and student engagement ledgers natively.</p>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        
+        <div class="col-xl-3 col-md-6">
+            <div class="card p-4 border-0 shadow-sm h-100 bg-white">
+                <span class="text-muted small fw-bold text-uppercase d-block mb-1">Roster Enrollment</span>
+                <div class="d-flex align-items-center justify-content-between">
+                    <h2 class="fw-bold text-dark mb-0">{{ students }}</h2>
+                    <span class="fs-2">🎓</span>
+                </div>
+                <div class="mt-3">
+                    <a href="{{ url_for('students.directory') }}" class="text-xs text-decoration-none text-success fw-semibold">Manage Student Profiles →</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card p-4 border-0 shadow-sm h-100 bg-white">
+                <span class="text-muted small fw-bold text-uppercase d-block mb-1">Admissions Pipeline</span>
+                <div class="d-flex align-items-center justify-content-between">
+                    <h2 class="fw-bold text-dark mb-0">{{ leads }}</h2>
+                    <span class="fs-2">📋</span>
+                </div>
+                <div class="mt-3">
+                    <a href="{{ url_for('admissions.dashboard') }}" class="text-xs text-decoration-none text-success fw-semibold">Review Admissions Pipeline →</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card p-4 border-0 shadow-sm h-100 bg-white">
+                <span class="text-muted small fw-bold text-uppercase d-block mb-1">Total Net Revenue</span>
+                <div class="d-flex align-items-center justify-content-between">
+                    <h2 class="fw-bold text-success mb-0">₹{{ revenue }}</h2>
+                    <span class="fs-2">💰</span>
+                </div>
+                <div class="mt-3">
+                    <a href="{{ url_for('fees.dashboard') }}" class="text-xs text-decoration-none text-success fw-semibold">Open Bookkeeping Records →</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card p-4 border-0 shadow-sm h-100 bg-white">
+                <span class="text-muted small fw-bold text-uppercase d-block mb-1">Avg Presence Index</span>
+                <div class="d-flex align-items-center justify-content-between">
+                    <h2 class="fw-bold text-dark mb-0">{{ attendance_rate }}%</h2>
+                    <span class="fs-2">📅</span>
+                </div>
+                <div class="mt-3">
+                    <a href="{{ url_for('attendance.dashboard') }}" class="text-xs text-decoration-none text-success fw-semibold">Track Classroom Logs →</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card p-4 border-0 shadow-sm bg-white">
+        <h5 class="fw-bold mb-3 text-dark">System Operations Directory</h5>
+        <div class="row g-3">
+            <div class="col-md-4 col-sm-6">
+                <a href="{{ url_for('students.directory') }}" class="btn btn-light w-100 py-3 text-start border shadow-sm rounded">
+                    <div class="fw-bold text-dark">🎓 Master Roster</div>
+                    <small class="text-muted d-block mt-1">Look up files, view records, search records.</small>
+                </a>
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <a href="{{ url_for('attendance.dashboard') }}" class="btn btn-light w-100 py-3 text-start border shadow-sm rounded">
+                    <div class="fw-bold text-dark">📅 Roll-Call Grid</div>
+                    <small class="text-muted d-block mt-1">Submit attendance, extract presence indicators.</small>
+                </a>
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <a href="{{ url_for('exams.dashboard') }}" class="btn btn-light w-100 py-3 text-start border shadow-sm rounded">
+                    <div class="fw-bold text-dark">📝 Exam Ledger</div>
+                    <small class="text-muted d-block mt-1">Input grades, review institutional card passes.</small>
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

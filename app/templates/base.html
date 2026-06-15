@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}School OS{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm py-3 mb-4">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold text-info" href="/">School OS 🚀</a>
+        
+        <form action="{{ url_for('students.directory') }}" method="GET" class="d-flex mx-auto col-12 col-md-4 my-2 my-md-0">
+            <input class="form-control me-2 border-0 bg-secondary bg-opacity-25 text-white placeholder-white-50 small" 
+                   type="search" name="search" placeholder="🔍 Search student by name..." aria-label="Search" value="{{ search_query if search_query else '' }}">
+        </form>
+
+        <div class="navbar-nav ms-auto align-items-center">
+            <a class="nav-link text-white me-3 fw-medium" href="{{ url_for('students.directory') }}">🎓 Student Roster</a>
+            <a class="nav-link text-white me-3 fw-medium" href="{{ url_for('admissions.dashboard') }}">📋 Admissions CRM</a>
+            <a class="nav-link text-white me-3 fw-medium" href="{{ url_for('fees.dashboard') }}">💰 Fee Management</a>
+            <a class="nav-link text-white me-3 fw-medium" href="{{ url_for('attendance.dashboard') }}">📅 Attendance</a>
+            <a class="nav-link text-white me-3 fw-medium" href="{{ url_for('exams.dashboard') }}">📝 Exams</a>
+        </div>
+    </div>
+</nav>
+
+    <div class="container mt-5">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{% if category == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

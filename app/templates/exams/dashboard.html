@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid py-2">
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <div class="card p-4 border-0 shadow-sm" style="border-left: 4px solid #3B5334 !important;">
+                <span class="text-muted small fw-bold text-uppercase">Total Exam Scripts Evaluated</span>
+                <h1 class="fw-bold mt-1 mb-0 text-dark">{{ total_graded }} Papers</h1>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card p-4 border-0 shadow-sm" style="border-left: 4px solid #198754 !important;">
+                <span class="text-muted small fw-bold text-uppercase">Institutional General Pass Rate</span>
+                <h1 class="fw-bold mt-1 mb-0 text-success">{{ pass_rate }}%</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card p-4 border-0 shadow-sm">
+                <h5 class="fw-bold mb-3 text-dark">Academic Performance Ledger</h5>
+                <div class="table-responsive">
+                    <table class="table table-borderless align-middle border-top pt-2">
+                        <thead>
+                            <tr class="text-muted small text-uppercase">
+                                <th class="pb-3">Student Name</th>
+                                <th class="pb-3">Class & Exam Type</th>
+                                <th class="pb-3">Subject</th>
+                                <th class="pb-3">Score Metrics</th>
+                                <th class="pb-3 text-end">Auto Grade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in results %}
+                            <tr class="border-bottom" style="border-color: #F4F1EA !important;">
+                                <td class="py-3 fw-semibold text-dark">{{ result.student_name }}</td>
+                                <td class="py-3">
+                                    <span class="badge bg-light border text-dark">{{ result.target_class }}</span>
+                                    <div class="text-muted small mt-0.5">{{ result.exam_type }}</div>
+                                </td>
+                                <td class="py-3 text-dark fw-medium">{{ result.subject }}</td>
+                                <td class="py-3">
+                                    <span class="text-dark fw-bold">{{ result.marks_obtained }}</span> 
+                                    <span class="text-muted">/ {{ result.max_marks }}</span>
+                                    <div class="text-muted small text-xs">{{ result.percentage|round(1) }}%</div>
+                                </td>
+                                <td class="py-3 text-end">
+                                    {% if 'Fail' in result.grade %}
+                                        <span class="badge bg-danger-subtle text-danger border border-danger px-3 py-1.5 rounded-pill fw-bold">{{ result.grade }}</span>
+                                    {% else %}
+                                        <span class="badge bg-success-subtle text-success border border-success px-3 py-1.5 rounded-pill fw-bold">{{ result.grade }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-5">No report card marks submitted to the database instance yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card p-4 border-0 shadow-sm">
+                <h5 class="fw-bold mb-1 text-dark">Enter Student Marks</h5>
+                <p class="text-muted small mb-4">Calculate performance cards instantly using database calculations.</p>
+                
+                <form action="{{ url_for('exams.add_mark') }}" method="POST">
+                    <div class="mb-2">
+                        <label class="form-label small fw-semibold">Student Name</label>
+                        <input type="text" name="student_name" class="form-control" style="background-color: #F7F5F0; border: 1px solid #EBE7DF;" placeholder="e.g. Rahul Sharma" required>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small fw-semibold">Class Selection</label>
+                        <select name="target_class" class="form-select" style="background-color: #F7F5F0; border: 1px solid #EBE7DF;" required>
+                            <option value="Nursery / KG">Nursery / KG</option>
+                            <option value="Primary Class 1-5">Primary Class 1-5</option>
+                            <option value="Middle School Class 6-8">Middle School Class 6-8</option>
+                            <option value="High School Class 9-10">High School Class 9-10</option>
+                            <option value="Senior Secondary 11-12">Senior Secondary 11-12</option>
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small fw-semibold">Subject Name</label>
+                        <input type="text" name="subject" class="form-control" style="background-color: #F7F5F0; border: 1px solid #EBE7DF;" placeholder="e.g. Mathematics, Science" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Exam Session</label>
+                        <select name="exam_type" class="form-select" style="background-color: #F7F5F0; border: 1px solid #EBE7DF;">
+                            <option value="Unit Test 1">Unit Test 1</option>
+                            <option value="Mid-Term Examination">Mid-Term Examination</option>
+                            <option value="Unit Test 2">Unit Test 2</option>
+                            <option value="Final Examination">Final Examination</option>
+                        </select>
+                    </div>
+                    <div class="row g-2 mb-4">
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Marks Secured</label>
+                            <input type="number" step="0.1" name="marks_obtained" class="form-control" style="background-color: #F7F5F0; border: 1px solid #EBE7DF;" placeholder="85" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Out of (Max)</label>
+                            <input type="number" step="0.1" name="max_marks" class="form-control" style="background-color: #F7F5F0; border: 1px solid #EBE7DF;" placeholder="100" value="100" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-dark w-100 py-2.5 shadow-sm">Commit Grade Metrics</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

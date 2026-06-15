@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid py-2">
+    
+    <div class="card p-4 border-0 shadow-sm bg-white mb-4">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center border" style="width: 65px; height: 65px; font-size: 2rem;">🎓</div>
+                <div>
+                    <h3 class="fw-bold text-dark mb-0">{{ student.full_name }}</h3>
+                    <p class="text-muted mb-0 small">Admission ID: <span class="mono fw-bold">#{{ student.admission_no }}</span> | Class: <span class="badge bg-light text-dark border">{{ student.target_class }}</span></p>
+                </div>
+            </div>
+            <div class="d-flex gap-4">
+                <div class="text-end">
+                    <span class="text-muted small d-block">ATTENDANCE RATE</span>
+                    <h3 class="fw-bold text-success mb-0">{{ attendance_rate }}%</h3>
+                </div>
+                <div class="text-end border-start ps-4">
+                    <span class="text-muted small d-block">TOTAL FEES CLEARED</span>
+                    <h3 class="fw-bold text-dark mb-0">₹{{ total_paid }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        
+        <div class="col-md-6">
+            <div class="card p-4 border-0 h-100 shadow-sm">
+                <h6 class="fw-bold text-dark mb-3">Report Card Marks History</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm table-borderless align-middle border-top pt-1">
+                        <thead>
+                            <tr class="text-muted text-xs text-uppercase">
+                                <th class="py-2">Exam Type</th>
+                                <th class="py-2">Subject</th>
+                                <th class="py-2">Score</th>
+                                <th class="py-2 text-end">Grade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for exam in academics %}
+                            <tr class="border-bottom text-sm" style="border-color: #F4F1EA !important;">
+                                <td class="py-2 text-muted">{{ exam.exam_type }}</td>
+                                <td class="py-2 fw-medium text-dark">{{ exam.subject }}</td>
+                                <td class="py-2 text-dark">{{ exam.marks_obtained }}/{{ exam.max_marks }}</td>
+                                <td class="py-2 text-end fw-bold text-success">{{ exam.grade }}</td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="4" class="text-center py-4 text-muted small">No exam papers registered under this student's name.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card p-4 border-0 h-100 shadow-sm">
+                <h6 class="fw-bold text-dark mb-3">Roll-Call Tracking History</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm table-borderless align-middle border-top pt-1">
+                        <thead>
+                            <tr class="text-muted text-xs text-uppercase">
+                                <th class="py-2">Date</th>
+                                <th class="py-2">Marked Status</th>
+                                <th class="py-2">Log Context Context</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in attendance %}
+                            <tr class="border-bottom text-sm" style="border-color: #F4F1EA !important;">
+                                <td class="py-2 text-muted">{{ log.date.strftime('%Y-%m-%d') }}</td>
+                                <td class="py-2">
+                                    <span class="badge {% if log.status == 'Present' %}bg-success{% else %}bg-danger{% endif %} px-2.5 py-1 rounded-pill small" style="font-size: 0.75rem;">{{ log.status }}</span>
+                                </td>
+                                <td class="py-2 text-muted small">{{ log.remarks if log.remarks else '—' }}</td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="3" class="text-center py-4 text-muted small">No daily attendance registry fields logged under this name.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="card p-4 border-0 shadow-sm">
+                <h6 class="fw-bold text-dark mb-3">Linked Accounting Transaction Receipts</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm table-borderless align-middle border-top pt-1">
+                        <thead>
+                            <tr class="text-muted text-xs text-uppercase">
+                                <th class="py-2">Receipt Date</th>
+                                <th class="py-2">Payment Method</th>
+                                <th class="py-2">Transaction Reference ID</th>
+                                <th class="py-2 text-end">Cleared Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for payment in payments %}
+                            <tr class="border-bottom text-sm" style="border-color: #F4F1EA !important;">
+                                <td class="py-2 text-muted">{{ payment.paid_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td class="py-2 text-dark">{{ payment.payment_mode }}</td>
+                                <td class="py-2 text-secondary mono small">{{ payment.reference_no if payment.reference_no else 'N/A' }}</td>
+                                <td class="py-2 text-end fw-bold text-success">₹{{ payment.amount_paid }}</td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="4" class="text-center py-4 text-muted small">No bookkeeping collections historical data points identified.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="mt-4">
+        <a href="{{ url_for('students.directory') }}" class="btn btn-sm btn-light border px-4">← Back to Master Directory</a>
+    </div>
+
+</div>
+{% endblock %}

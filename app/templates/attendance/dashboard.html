@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid py-2">
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card p-3 border-0 shadow-sm" style="border-left: 4px solid #3B5334 !important;">
+                <span class="text-muted small fw-bold text-uppercase">Total Marked Today</span>
+                <h2 class="fw-bold mt-1 mb-0 text-dark">{{ total }}</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 border-0 shadow-sm" style="border-left: 4px solid #198754 !important;">
+                <span class="text-muted small fw-bold text-uppercase">Present Students</span>
+                <h2 class="fw-bold mt-1 mb-0 text-success">{{ presents }}</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 border-0 shadow-sm" style="border-left: 4px solid #dc3545 !important;">
+                <span class="text-muted small fw-bold text-uppercase">Absent Students</span>
+                <h2 class="fw-bold mt-1 mb-0 text-danger">{{ absents }}</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 border-0 shadow-sm" style="border-left: 4px solid #4A5D4E !important;">
+                <span class="text-muted small fw-bold text-uppercase">Presence Rate</span>
+                <h2 class="fw-bold mt-1 mb-0" style="color: #3B5334;">{{ rate }}%</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card p-4 border-0 shadow-sm">
+                <h5 class="fw-bold mb-3 text-dark">Attendance Sheet History Log</h5>
+                <div class="table-responsive">
+                    <table class="table table-borderless align-middle border-top pt-2">
+                        <thead>
+                            <tr class="text-muted small text-uppercase">
+                                <th class="pb-3">Date</th>
+                                <th class="pb-3">Student Full Name</th>
+                                <th class="pb-3">Class/Grade</th>
+                                <th class="pb-3">Status</th>
+                                <th class="pb-3">Remarks Context</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in logs %}
+                            <tr class="border-bottom" style="border-color: #F4F1EA !important;">
+                                <td class="py-3 small text-muted">{{ log.date.strftime('%Y-%m-%d') }}</td>
+                                <td class="py-3 fw-semibold text-dark">{{ log.student_name }}</td>
+                                <td class="py-3"><span class="badge bg-light border text-dark">{{ log.target_class }}</span></td>
+                                <td class="py-3">
+                                    {% if log.status == 'Present' %}
+                                        <span class="badge bg-success-subtle border border-success text-success px-3 py-1.5 rounded-pill">Present</span>
+                                    {% elif log.status == 'Absent' %}
+                                        <span class="badge bg-danger-subtle border border-danger text-danger px-3 py-1.5 rounded-pill">Absent</span>
+                                    {% else %}
+                                        <span class="badge bg-warning-subtle border border-warning text-warning px-3 py-1.5 rounded-pill">Late Roll</span>
+                                    {% endif %}
+                                </td>
+                                <td class="py-3 text-muted small">{{ log.remarks if log.remarks else '—' }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-5">No active roll-call attendance logs registered inside SQLite databases yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card p-4 border-0 shadow-sm">
+                <h5 class="fw-bold mb-1 text-dark">Log Daily Entry</h5>
+                <p class="text-muted small mb-4">Mark single-student presence states for date: <strong>{{ today.strftime('%d-%b-%Y') }}</strong></p>
+                
+                <form action="{{ url_for('attendance.mark_attendance') }}" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Student Name</label>
+                        <input type="text" name="student_name" class="form-control" style="background-color: #F7F5F0; border: 1px solid #EBE7DF;" placeholder="e.g. Rahul Sharma" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Class Selection</label>
+                        <select name="target_class" class="form-select" style="background-color: #F7F5F0; border: 1px solid #EBE7DF;" required>
+                            <option value="Nursery / KG">Nursery / KG</option>
+                            <option value="Primary Class 1-5">Primary Class 1-5</option>
+                            <option value="Middle School Class 6-8">Middle School Class 6-8</option>
+                            <option value="High School Class 9-10">High School Class 9-10</option>
+                            <option value="Senior Secondary 11-12">Senior Secondary 11-12</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Attendance Status</label>
+                        <div class="d-flex gap-3 mt-1">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="status" id="p" value="Present" checked>
+                                <label class="form-check-label text-success font-semibold" for="p">Present</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="status" id="a" value="Absent">
+                                <label class="form-check-label text-danger font-semibold" for="a">Absent</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="status" id="l" value="Late">
+                                <label class="form-check-label text-warning font-semibold" for="l">Late</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label small fw-semibold">Log Context Notes / Reasons</label>
+                        <input type="text" name="remarks" class="form-control" style="background-color: #F7F5F0; border: 1px solid #EBE7DF;" placeholder="e.g. Parent sent medical leave note...">
+                    </div>
+                    <button type="submit" class="btn btn-olive w-100 py-2.5 shadow-sm">Save Sheet Record</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
